@@ -13,7 +13,8 @@ var COMPONENTS_DIR = path.resolve(__dirname, 'components');
 var LIB_DIR = path.resolve(__dirname, 'lib');
 var PAGE_BOOTLOADER_PATH = path.resolve(__dirname, 'pageBootloader.js');
 
-function getJSBundleData() {
+
+function fetchJSBundleData() {
   return new Promise(function(res, rej) {
     console.log('Finding all files under ./components/...');
     var compsGlob = path.resolve(COMPONENTS_DIR, '*.js');
@@ -60,6 +61,14 @@ function getJSBundleData() {
       bStream.on('end', function() { res(jsBundleData); });
     });
   });
+}
+
+var jsBundleData = null;
+function getJSBundleData() {
+  if (jsBundleData === null) {
+    jsBundleData = fetchJSBundleData();
+  }
+  return jsBundleData;
 }
 
 getJSBundleData().done(function(jsBundleData) {
