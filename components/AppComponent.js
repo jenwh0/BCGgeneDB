@@ -1,25 +1,45 @@
 var React = require('React');
+var keggAPI = require('../lib/keggAPI');
 
 module.exports = React.createClass({
+  onUpdateOrgName: function(event) {
+  	this.state.orgName = event.target.value;
+  },
+  onUpdateGeneDescription: function(event) {
+  	this.state.geneDescription = event.target.value;
+  },
+  onFindSubmit: function() {
+  	console.log(this.state.orgName, this.state.geneDescription);
+  	keggAPI.find(this.state.orgName, this.state.geneDescription).then(function(response){
+  		console.log("API response: ",response);
+  	});
+  },
+  getInitialState: function() {
+  	return {orgName: 'mbb', geneDescription: 'hydroxylase'};
+
+  },
   render: function() {
     return (
     	<div>
-    	<form action = "">
-    	Enter organism: <input type="text" name="orgName" value="mbb" /><br />
-    	<em>NB: mbb = M. bovis BCG; mtv = M. tuberculosis H37Rv; msg = M. smegmatis MC2 155</em><br />
-    	Search gene description: <input type="text" name="geneDescription" value="hydroxylase" /><br />
-    	<input type="submit" value="Submit"/><br />
-    	</form>
+    	Enter organism:
+    	<input type="text" name="orgName" defaultValue={this.state.orgName} onChange={this.onUpdateOrgName} /><br />
+
+    	<em>(NB: mbb = M. bovis BCG; mtv = M. tuberculosis H37Rv; msg = M. smegmatis MC2 155)</em><br /><br />
+
+    	Search gene description:
+    	<input type="text" name="geneDescription" defaultValue={this.state.geneDescription} onChange={this.onUpdateGeneDescription} /><br /><br />
+    	<input type="submit" onClick={this.onFindSubmit} value="Submit"/><br />
+    	
     	{/*rest.kgg/jp/find/[orgName]/[geneDescription]
     	//return number of entries
     	//can manually curate entries & delete
     	//save entries in a list. upon saving, retrieve all
     	//parameters: http://rest.kegg.jp/get/mbb:BCG_0816c/ including ntseq and aaseq
 		*/}
-    	<form action = "">
-    	Save gene entries? <input type="text" name="listName" value="list name"/><br/>
+    	
+    	Save gene entries? <input type="text" name="listName" defaultValue="list name"/><br/>
     	<input type="submit" value="Submit" />
-    	</form>
+    	
     	</div>
     	);
   }
