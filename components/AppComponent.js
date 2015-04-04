@@ -24,7 +24,10 @@ module.exports = React.createClass({
   	this.setState({findResults: response});
   },
   onGetNTseq: function() {
-  	keggAPI.get();
+  	keggAPI.getNtSeqs(this.state.findResults.map(function(result){return result[0]})).done(this.onNTseqReceive);
+  },
+  onNTseqReceive: function(response) {
+  	this.setState({NTseqresults: response});
   },
   onGetAAseq: function() {
   	keggAPI.get();
@@ -40,26 +43,32 @@ module.exports = React.createClass({
     		</tr>;
     	});
 	var numResults = tablerows.length;
+	var table = null;
+	if (numResults >0) {
+		table =
+			<table class="table table-hover table-condensed">
+    			<thead><tr><th>#</th><th>Name</th><th>Description</th></tr></thead>
+    			<tbody>{tablerows} </tbody>
+    		</table>;
+	}
 
     return (
     	<div>
-    	Enter organism:
+    	<p>Enter organism:
     	<input type="text" name="orgName" defaultValue={this.state.orgName} onChange={this.onUpdateOrgName} /><br />
 
     	<small><em>(NB: mbb = M. bovis BCG Pasteur 1173P2; mtu,mtv = M. tuberculosis H37Rv; msm,msg,msb = M. smegmatis MC2 155)</em></small>
-    	<br /><br />
+    	<br /></p>
 
-    	Search gene description:
-    	<input type="text" name="geneDescription" defaultValue={this.state.geneDescription} onChange={this.onUpdateGeneDescription} /><br /><br />
+    	<p>Search gene description:
+    	<input type="text" name="geneDescription" defaultValue={this.state.geneDescription} onChange={this.onUpdateGeneDescription} /><br />
     	<input type="submit" onClick={this.onFindSubmit} value="Submit"/><br />
+    	</p>
     	
     	<br />
     	Found {numResults} results.
     	<br />
-    	<table class="table table-hover table-condensed">
-    	<thead><tr><th>#</th><th>Name</th><th>Description</th></tr></thead>
-    	<tbody>{tablerows} </tbody>
-    	</table>
+    	{table}
     	<br />
 
 		Get full results? &nbsp; &nbsp;
@@ -69,6 +78,7 @@ module.exports = React.createClass({
     	</div>
     	);
   }
+});
 
     	{/*
     	//can manually curate entries & delete
