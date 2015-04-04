@@ -1,20 +1,24 @@
+var q = require('q');
+global.Promise = q.Promise;
+
 var browserify = require('browserify');
 var express = require('express');
 var glob = require('glob');
+var fetch = require('node-fetch');
 var path = require('path');
-var q = require('q');
 var reactTools = require('react-tools');
 var through = require('through');
 
-var Promise = q.Promise;
-
 var COMPONENTS_DIR = path.resolve(__dirname, 'components');
+var LIB_DIR = path.resolve(__dirname, 'lib');
 var PAGE_BOOTLOADER_PATH = path.resolve(__dirname, 'pageBootloader.js');
 
 function getJSBundleData() {
   return new Promise(function(res, rej) {
     console.log('Finding all files under ./components/...');
-    glob(path.resolve(COMPONENTS_DIR, '*.js'), null, function(err, files) {
+    var compsGlob = path.resolve(COMPONENTS_DIR, '*.js');
+    var libGlob = path.resolve(LIB_DIR, '*.js');
+    glob('{' + compsGlob + ',' + libGlob + '}', null, function(err, files) {
       if (err) { rej(err); }
       console.log(' - Found ' + files.length + ' files.');
 
@@ -78,7 +82,22 @@ getJSBundleData().done(function(jsBundleData) {
     res.send(jsBundleData);
   });
 
-  var server = app.listen(3000, function() {
+  app.get('/keggAPI/find/', function(req, res) {
+    var e_db = encodeURIComponent(req.query.db);
+    var e_query = encodeURIComponent(req.query.q);
+
+    var url = 'http://rest.kegg.jp/find/' + e_db + '/' + e_query;
+    console.log('Fetching from KEGG API: ' + url + '...');
+    fetch(url)
+      .then(function(response) {
+        return response.text();
+      })
+      .done(function(response) {
+        res.send(response);
+      });
+  });
+
+  var server = app.listen(3000, 'localhost', function() {
     var host = server.address().address;
     var port = server.address().port;
     console.log(' - Webserver started at: http://%s:%s/', host, port);

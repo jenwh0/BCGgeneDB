@@ -1,3 +1,6 @@
+var q = require('q');
+global.Promise = q.Promise;
+
 var AppComponent = require('./components/AppComponent');
 var React = require('react');
 

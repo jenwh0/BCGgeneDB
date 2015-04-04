@@ -20,9 +20,11 @@
     "browserify": "^9.0.7",
     "express": "^4.12.3",
     "glob": "^5.0.3",
+    "node-fetch": "^1.0.6",
     "q": "^1.2.0",
     "react": "^0.13.1",
     "react-tools": "^0.13.1",
-    "through": "^2.3.6"
+    "through": "^2.3.6",
+    "whatwg-fetch": "^0.7.0"
   }
 }
