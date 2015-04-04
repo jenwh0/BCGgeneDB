@@ -121,6 +121,39 @@ app.get('/keggAPI/find/', function(req, res) {
     });
 });
 
+app.get('/keggAPI/getNtSeqs/', function(req, res) {
+  var dbs = JSON.parse(req.query.dbNames);
+
+  var dbsToQuery;
+  var prevQuery = Promise.resolve('');
+  do {
+    if (dbs.length > 10) {
+      dbsToQuery = dbs.slice(0, 10);
+      dbs = dbs.slice(10);
+    } else {
+      dbsToQuery = dbs.slice(0);
+      dbs = [];
+    }
+
+    var e_dbs = dbsToQuery.map(encodeURIComponent).join('+');
+    var url = 'http://rest.kegg.jp/get/' + e_dbs + '/ntseq';
+    console.log('Fetching from KEGG API: ' + url + '...');
+    var thisFetch = fetch(url).then(function(response) {
+      return response.text();
+    });
+    prevQuery = prevQuery.then(function(prevResult) {
+      return thisFetch.then(function(result) {
+        return prevResult + '\n' + result.trim();
+      });
+    });
+  } while (dbs.length > 0);
+
+  return prevQuery.then(function(result) {
+    res.send(result);
+  });
+});
+
+
 var server = app.listen(3000, 'localhost', function() {
   var host = server.address().address;
   var port = server.address().port;
