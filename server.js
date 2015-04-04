@@ -3,6 +3,7 @@ global.Promise = q.Promise;
 
 var browserify = require('browserify');
 var express = require('express');
+var fs = require('fs');
 var glob = require('glob');
 var fetch = require('node-fetch');
 var path = require('path');
@@ -10,6 +11,7 @@ var reactTools = require('react-tools');
 var through = require('through');
 
 var COMPONENTS_DIR = path.resolve(__dirname, 'components');
+var CSS_DIR = path.resolve(__dirname, 'css');
 var LIB_DIR = path.resolve(__dirname, 'lib');
 var PAGE_BOOTLOADER_PATH = path.resolve(__dirname, 'pageBootloader.js');
 
@@ -82,21 +84,31 @@ getJSBundleData();
 console.log('Starting web server...');
 var app = express();
 app.get('/', function(req, res) {
-  res.send([
-    '<html>',
-    '  <head>',
-    '    <title>BCGgeneDB</title>',
-    '  </head>',
-    '  <body>',
-    '    <div id="toplevel"></div>',
-    '    <script src="http://fb.me/react-0.13.1.js"></script>',
-    '    <script src="/bundle.js"></script>',
-    '    <script type="text/javascript">',
-    '      require("./pageBootloader.js").startPage();',
-    '    </script>',
-    '  </body>',
-    '</html>',
-  ].join('\n'));
+  glob(path.resolve(CSS_DIR, '*.css'), null, function(err, files) {
+    var linkTags = files.map(function(filePath) {
+      filePath = path.join('css' + filePath.slice(CSS_DIR.length));
+      return '<link rel="stylesheet" type="text/css" href="' + filePath + '">';
+    });
+
+    console.log('Generating page with ' + linkTags.length + ' css files...');
+
+    res.send([
+      '<html>',
+      '  <head>',
+      '    <title>BCGgeneDB</title>',
+      ].concat(linkTags).concat([
+      '  </head>',
+      '  <body>',
+      '    <div id="toplevel"></div>',
+      '    <script src="http://fb.me/react-0.13.1.js"></script>',
+      '    <script src="/bundle.js"></script>',
+      '    <script type="text/javascript">',
+      '      require("./pageBootloader.js").startPage();',
+      '    </script>',
+      '  </body>',
+      '</html>',
+    ]).join('\n'));
+  });
 });
 
 app.get('/bundle.js', function(req, res) {
@@ -153,6 +165,15 @@ app.get('/keggAPI/getNtSeqs/', function(req, res) {
   });
 });
 
+app.get('/css/*.css', function(req, res) {
+  console.log('Request for /css/' + req.params[0] + '.css ...');
+  var filePath = path.resolve(CSS_DIR, req.params[0] + '.css');
+  fs.readFile(filePath, function(err, data) {
+    if (err) { throw err; }
+    res.set('Content-Type', 'text/css');
+    res.send(data);
+  });
+});
 
 var server = app.listen(3000, 'localhost', function() {
   var host = server.address().address;
