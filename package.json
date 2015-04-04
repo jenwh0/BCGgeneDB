@@ -1,0 +1,27 @@
+{
+  "name": "BCGgeneDB",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jenwh0/BCGgeneDB.git"
+  },
+  "author": "jenwh0",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jenwh0/BCGgeneDB/issues"
+  },
+  "homepage": "https://github.com/jenwh0/BCGgeneDB",
+  "dependencies": {
+    "browserify": "^9.0.7",
+    "express": "^4.12.3",
+    "glob": "^5.0.3",
+    "react": "^0.13.1",
+    "react-tools": "^0.13.1",
+    "through": "^2.3.6"
+  }
+}
