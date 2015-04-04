@@ -10,7 +10,7 @@ module.exports = React.createClass({
   },
   onFindSubmit: function() {
   	console.log(this.state.orgName, this.state.geneDescription);
-  	keggAPI.find(this.state.orgName, this.state.geneDescription).then(function(response){
+  	keggAPI.find(this.state.orgName, this.state.geneDescription).done(function(response){
   		console.log("API response: ",response);
   	});
   },
