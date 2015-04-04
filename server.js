@@ -34,12 +34,19 @@ function getJSBundleData() {
       });
 
       console.log(' - Setting up file transformer...');
-      bInst.transform(function() {
+      bInst.transform(function(fname) {
         var data = '';
         return through(
           function(chunk) { data += chunk; },
           function() {
-            this.queue(reactTools.transform(data, {harmony: true}));
+            var result;
+            try {
+              result = reactTools.transform(data, {harmony: true});
+            } catch(e) {
+              e.message = fname + ': ' + e.message;
+              throw e;
+            }
+            this.queue(result);
             this.queue(null);
           }
         );
