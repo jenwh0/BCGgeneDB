@@ -85,10 +85,12 @@ console.log('Starting web server...');
 var app = express();
 app.get('/', function(req, res) {
   glob(path.resolve(CSS_DIR, '*.css'), null, function(err, files) {
-    var linkTags = files.map(function(filePath) {
-      filePath = path.join('css' + filePath.slice(CSS_DIR.length));
-      return '<link rel="stylesheet" type="text/css" href="' + filePath + '">';
-    });
+    var linkTags = files
+      .sort()
+      .map(function(file) {
+        file = path.join('css' + file.slice(CSS_DIR.length));
+        return '<link rel="stylesheet" type="text/css" href="' + file + '">';
+      });
 
     console.log('Generating page with ' + linkTags.length + ' css files...');
 
