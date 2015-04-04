@@ -1,9 +1,10 @@
+
 var React = require('React');
 var keggAPI = require('../lib/keggAPI');
 
 module.exports = React.createClass({
   getInitialState: function() {
-  	return {orgName: 'mbb', geneDescription: 'hydroxylase', findResults: [], listName: 'list name'};
+  	return {orgName: 'mbb', geneDescription: 'hydroxylase', findResults: []};
   },
   onUpdateOrgName: function(event) {
   	this.state.orgName = event.target.value;
@@ -22,10 +23,12 @@ module.exports = React.createClass({
   	console.log("API response: ", response);
   	this.setState({findResults: response});
   },
-  onUpdatelistSave: function(listName) {
+  onGetNTseq: function() {
+  	keggAPI.get();
   },
-
-  
+  onGetAAseq: function() {
+  	keggAPI.get();
+  },
   render: function() {
     var tablerows = this.state.findResults
     	.map(function(result,index){
@@ -43,7 +46,8 @@ module.exports = React.createClass({
     	Enter organism:
     	<input type="text" name="orgName" defaultValue={this.state.orgName} onChange={this.onUpdateOrgName} /><br />
 
-    	<em>(NB: mbb = M. bovis BCG; mtv = M. tuberculosis H37Rv; msg = M. smegmatis MC2 155)</em><br /><br />
+    	<small><em>(NB: mbb = M. bovis BCG Pasteur 1173P2; mtu,mtv = M. tuberculosis H37Rv; msm,msg,msb = M. smegmatis MC2 155)</em></small>
+    	<br /><br />
 
     	Search gene description:
     	<input type="text" name="geneDescription" defaultValue={this.state.geneDescription} onChange={this.onUpdateGeneDescription} /><br /><br />
@@ -52,8 +56,19 @@ module.exports = React.createClass({
     	<br />
     	Found {numResults} results.
     	<br />
-    	<table> <tbody>{tablerows} </tbody> </table>
-    	<br /><br />
+    	<table class="table table-hover table-condensed">
+    	<thead><tr><th>#</th><th>Name</th><th>Description</th></tr></thead>
+    	<tbody>{tablerows} </tbody>
+    	</table>
+    	<br />
+
+		Get full results? &nbsp; &nbsp;
+    	<input type="submit" onClick={this.onGetNTseq} value="NT seq" /> &nbsp;
+    	<input type="submit" onClick={this.onGetAAseq} value="AA seq" />
+    	
+    	</div>
+    	);
+  }
 
     	{/*
     	//can manually curate entries & delete
@@ -61,10 +76,5 @@ module.exports = React.createClass({
     	//parameters: http://rest.kegg.jp/get/mbb:BCG_0816c/ including ntseq and aaseq
 		*/}
     	
-    	Save gene entries? <input type="text" name="listName" defaultValue={this.state.listName} onChange={this.onUpdatelistName}/><br/>
-    	<input type="submit" onClick={this.onUpdatelistSave} value="Save" />
     	
-    	</div>
-    	);
-  }
-});
+
