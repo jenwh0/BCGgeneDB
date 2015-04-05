@@ -140,6 +140,7 @@ app.get('/keggAPI/getNtSeqs/', function(req, res) {
 
   var dbsToQuery;
   var prevQuery = Promise.resolve('');
+  var fetches = [];
   do {
     if (dbs.length > 10) {
       dbsToQuery = dbs.slice(0, 10);
@@ -152,15 +153,18 @@ app.get('/keggAPI/getNtSeqs/', function(req, res) {
     var e_dbs = dbsToQuery.map(encodeURIComponent).join('+');
     var url = 'http://rest.kegg.jp/get/' + e_dbs + '/ntseq';
     console.log('Fetching from KEGG API: ' + url + '...');
-    var thisFetch = fetch(url).then(function(response) {
+    fetches.push(fetch(url).then(function(response) {
       return response.text();
-    });
+    }));
+  } while(dbs.length > 0);
+
+  fetches.forEach(function(fetch) {
     prevQuery = prevQuery.then(function(prevResult) {
-      return thisFetch.then(function(result) {
+      return fetch.then(function(result) {
         return prevResult + '\n' + result.trim();
       });
     });
-  } while (dbs.length > 0);
+  });
 
   return prevQuery.then(function(result) {
     res.send(result);
