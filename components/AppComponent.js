@@ -8,7 +8,7 @@ module.exports = React.createClass({
   		orgName: 'mbb',
   		geneDescription: 'cytochrome',
   		findResults: [],
-
+  		NTseqresults: {},
   	};
   },
   onUpdateOrgName: function(event) {
@@ -41,7 +41,6 @@ module.exports = React.createClass({
   render: function() {
     var tablerows = this.state.findResults
     	.map(function(result,index){
-    		
     		return <tr key={"result_"+index}>
     		<td>{index+1}.</td>
     		<td><a href={"http://www.kegg.jp/dbget-bin/www_bget?"+result[0]}>{result[0]}</a></td>
@@ -50,19 +49,19 @@ module.exports = React.createClass({
     	});
 	var numResults = tablerows.length;
 	var table = null;
-	var buttons = null;
 	if (numResults >0) {
 		table =
 			<table class="table table-bordered">
     			<thead><tr><th>#</th><th>Name</th><th>Description</th></tr></thead>
     			<tbody class="table table-hover">{tablerows} </tbody>
     		</table>;
-    	buttons = 
-    		<div>Get full results? &nbsp; &nbsp;
-    		<input type="submit" onClick={this.onGetNTseq} value="NT seq" />&nbsp;
-    		<input type="submit" onClick={this.onGetAAseq} value="AA seq" /></div>;
 	}
-
+	var NTseq = this.state.onNTseqReceive
+		.map(function(result){
+			return <div>
+			result
+			</div>;
+		})
     return (
     	<div>
     	<p>Enter organism:
@@ -81,7 +80,11 @@ module.exports = React.createClass({
     	<br />
     	{table}
     	<br />
-    	{buttons}
+    	<div>
+    		Get full results? &nbsp; &nbsp;
+    		<input type="submit" onClick={this.onGetNTseq} value="NT seq" />&nbsp;
+    		<input type="submit" onClick={this.onGetAAseq} value="AA seq" />
+    	</div>
     	</div>
     	);
   }
