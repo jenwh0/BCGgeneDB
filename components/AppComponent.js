@@ -9,6 +9,7 @@ module.exports = React.createClass({
   		geneDescription: 'hydrase',
   		findResults: [],
   		NTseqResults: {},
+  		AAseqResults: {},
   	};
   },
 
@@ -41,6 +42,15 @@ module.exports = React.createClass({
   	console.log("response received");
   },
 
+  onGetAAseq: function() {
+  	keggAPI.getAASeqs(this.state.findResults.map((result) => {return result[0]})).done(this.onAAseqReceive);
+  	console.log("here you clicked AA");
+  },
+  onAAseqReceive: function(results) {
+  	this.setState({AAseqResults: results});
+  	console.log("response received AA");
+  },  
+
   render: function() {
     var tablerows = this.state.findResults
     	.map((result,index) => {
@@ -71,6 +81,15 @@ module.exports = React.createClass({
 			</div>;
 		})
 
+	var AAseqdivs = Object.keys(this.state.AAseqResults)
+		.map((name, index) => {
+			var data = this.state.AAseqResults[name];
+			return <div key={"seq_"+index}>
+			{name} &nbsp; {data.description}<br />
+			{data.seq}
+			</div>;
+		})
+
     return (
     	<div>
     		<p>Enter organism: &nbsp;
@@ -91,19 +110,15 @@ module.exports = React.createClass({
 	    	<div>
 	    		Get full results? &nbsp; &nbsp;
 	    		<input type="submit" onClick={this.onGetNTseq} value="NT seq" />&nbsp;
-	    		{/*<input type="submit" value="AA seq" />*/}
+	    		<input type="submit" onClick={this.onGetAAseq} value="AA seq" />
 	    	</div>
-	    	{NTseqdivs}
+	    	{NTseqdivs}<br />
+	    	{AAseqdivs}
     	</div>
     	);
   }
 });
 
-    	{/*
-    	//can manually curate entries & delete
-    	//save entries in a list. upon saving, retrieve all
-    	//parameters: http://rest.kegg.jp/get/mbb:BCG_0816c/ including ntseq and aaseq
-		*/}
     	
     	
 

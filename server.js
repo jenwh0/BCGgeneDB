@@ -171,6 +171,43 @@ app.get('/keggAPI/getNtSeqs/', function(req, res) {
   });
 });
 
+app.get('/keggAPI/getAASeqs/', function(req, res) {
+  var dbs = JSON.parse(req.query.dbNames);
+
+  var dbsToQuery;
+  var prevQuery = Promise.resolve('');
+  var fetches = [];
+  do {
+    if (dbs.length > 10) {
+      dbsToQuery = dbs.slice(0, 10);
+      dbs = dbs.slice(10);
+    } else {
+      dbsToQuery = dbs.slice(0);
+      dbs = [];
+    }
+
+    var e_dbs = dbsToQuery.map(encodeURIComponent).join('+');
+    var url = 'http://rest.kegg.jp/get/' + e_dbs + '/aaseq';
+    console.log('Fetching from KEGG API: ' + url + '...');
+    fetches.push(fetch(url).then(function(response) {
+      return response.text();
+    }));
+  } while(dbs.length > 0);
+
+  fetches.forEach(function(fetch) {
+    prevQuery = prevQuery.then(function(prevResult) {
+      return fetch.then(function(result) {
+        return prevResult + '\n' + result.trim();
+      });
+    });
+  });
+
+  return prevQuery.then(function(result) {
+    res.send(result);
+  });
+});
+
+
 app.get('/css/*.css', function(req, res) {
   console.log('Request for /css/' + req.params[0] + '.css ...');
   var filePath = path.resolve(CSS_DIR, req.params[0] + '.css');
