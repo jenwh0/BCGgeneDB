@@ -6,41 +6,44 @@ module.exports = React.createClass({
   getInitialState: function() {
   	return {
   		orgName: 'mbb',
-  		geneDescription: 'cytochrome',
+  		geneDescription: 'hydrase',
   		findResults: [],
-  		NTseqresults: {},
+  		NTseqResults: {},
   	};
   },
+
   onUpdateOrgName: function(event) {
   	this.state.orgName = event.target.value;
   },
+
   onUpdateGeneDescription: function(event) {
   	this.state.geneDescription = event.target.value;
   },
-  onUpdatelistName: function(event) {
-  	this.state.listName = event.target.value;
-  },
+
   onFindSubmit: function() {
   	console.log(this.state.orgName, this.state.geneDescription);
   	keggAPI.find(this.state.orgName, this.state.geneDescription).done(this.onFindReceive);
   },
-  onFindReceive: function(response) {
-  	console.log("API response: ", response);
-  	this.setState({findResults: response});
+  onFindReceive: function(results) {
+  	console.log("API response: ", results);
+  	this.setState({
+  		findResults: results,
+  		orgName: 'asd'
+  	});
   },
+
   onGetNTseq: function() {
-  	keggAPI.getNtSeqs(this.state.findResults.map(function(result){return result[0]})).done(this.onNTseqReceive);
+  	keggAPI.getNtSeqs(this.state.findResults.map((result) => {return result[0]})).done(this.onNTseqReceive);
+  	console.log("here you clicked");
   },
-  onNTseqReceive: function(response) {
-  	this.setState({NTseqresults: response});
-  	console.log("NTseqresults: ", Object.keys(response).length);
+  onNTseqReceive: function(results) {
+  	this.setState({NTseqResults: results});
+  	console.log("response received");
   },
-  onGetAAseq: function() {
-  	keggAPI.get();
-  },
+
   render: function() {
     var tablerows = this.state.findResults
-    	.map(function(result,index){
+    	.map((result,index) => {
     		return <tr key={"result_"+index}>
     		<td>{index+1}.</td>
     		<td><a href={"http://www.kegg.jp/dbget-bin/www_bget?"+result[0]}>{result[0]}</a></td>
@@ -50,41 +53,47 @@ module.exports = React.createClass({
 	var numResults = tablerows.length;
 	var table = null;
 	if (numResults >0) {
-		table =
+		table = <div>
+			Found {numResults} results.
+	    	<br />
 			<table class="table table-bordered">
     			<thead><tr><th>#</th><th>Name</th><th>Description</th></tr></thead>
     			<tbody class="table table-hover">{tablerows} </tbody>
-    		</table>;
+    		</table></div>;
 	}
-	var NTseq = this.state.onNTseqReceive
-		.map(function(result){
-			return <div>
-			result
+
+	var NTseqdivs = Object.keys(this.state.NTseqResults)
+		.map((name, index) => {
+			var data = this.state.NTseqResults[name];
+			return <div key={"seq_"+index}>
+			{name} &nbsp; {data.description}<br />
+			{data.seq}
 			</div>;
 		})
+
     return (
     	<div>
-    	<p>Enter organism:
-    	<input type="text" name="orgName" defaultValue={this.state.orgName} onChange={this.onUpdateOrgName} /><br />
+    		<p>Enter organism: &nbsp;
+	    	<input type="text" name="orgName" defaultValue={this.state.orgName} onChange={this.onUpdateOrgName} /><br />
 
-    	<small><em>(NB: mbb = M. bovis BCG Pasteur 1173P2; mtu,mtv = M. tuberculosis H37Rv; msm,msg,msb = M. smegmatis MC2 155)</em></small>
-    	<br /></p>
+	    	<small><em>(NB: mbb = M. bovis BCG Pasteur 1173P2; mtu,mtv = M. tuberculosis H37Rv; msm,msg,msb = M. smegmatis MC2 155)</em></small>
+	    	<br /></p>
 
-    	<p>Search gene description:
-    	<input type="text" name="geneDescription" defaultValue={this.state.geneDescription} onChange={this.onUpdateGeneDescription} /><br />
-    	<input type="submit" onClick={this.onFindSubmit} value="Submit"/><br />
-    	</p>
-    	
-    	<br />
-    	Found {numResults} results.
-    	<br />
-    	{table}
-    	<br />
-    	<div>
-    		Get full results? &nbsp; &nbsp;
-    		<input type="submit" onClick={this.onGetNTseq} value="NT seq" />&nbsp;
-    		<input type="submit" onClick={this.onGetAAseq} value="AA seq" />
-    	</div>
+	    	<p>Search gene description: &nbsp;
+	    	<input type="text" name="geneDescription" defaultValue={this.state.geneDescription} onChange={this.onUpdateGeneDescription} /><br />
+	    	<input type="submit" onClick={this.onFindSubmit} value="Submit"/><br />
+	    	</p>
+	    	
+	    	<br />
+	    	
+	    	{table}
+	    	<hr />
+	    	<div>
+	    		Get full results? &nbsp; &nbsp;
+	    		<input type="submit" onClick={this.onGetNTseq} value="NT seq" />&nbsp;
+	    		{/*<input type="submit" value="AA seq" />*/}
+	    	</div>
+	    	{NTseqdivs}
     	</div>
     	);
   }
