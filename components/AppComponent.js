@@ -6,7 +6,7 @@ module.exports = React.createClass({
   getInitialState: function() {
   	return {
   		orgName: 'mbb',
-  		geneDescription: 'hydroxylase',
+  		geneDescription: 'cytochrome',
   		findResults: [],
 
   	};
@@ -50,12 +50,17 @@ module.exports = React.createClass({
     	});
 	var numResults = tablerows.length;
 	var table = null;
+	var buttons = null;
 	if (numResults >0) {
 		table =
-			<table class="table table-hover">
+			<table class="table table-bordered">
     			<thead><tr><th>#</th><th>Name</th><th>Description</th></tr></thead>
-    			<tbody>{tablerows} </tbody>
+    			<tbody class="table table-hover">{tablerows} </tbody>
     		</table>;
+    	buttons = 
+    		<div>Get full results? &nbsp; &nbsp;
+    		<input type="submit" onClick={this.onGetNTseq} value="NT seq" />&nbsp;
+    		<input type="submit" onClick={this.onGetAAseq} value="AA seq" /></div>;
 	}
 
     return (
@@ -76,11 +81,7 @@ module.exports = React.createClass({
     	<br />
     	{table}
     	<br />
-
-		Get full results? &nbsp; &nbsp;
-    	<input type="submit" onClick={this.onGetNTseq} value="NT seq" /> &nbsp;
-    	<input type="submit" onClick={this.onGetAAseq} value="AA seq" />
-    	
+    	{buttons}
     	</div>
     	);
   }
