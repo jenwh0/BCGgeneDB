@@ -4,7 +4,12 @@ var keggAPI = require('../lib/keggAPI');
 
 module.exports = React.createClass({
   getInitialState: function() {
-  	return {orgName: 'mbb', geneDescription: 'hydroxylase', findResults: []};
+  	return {
+  		orgName: 'mbb',
+  		geneDescription: 'hydroxylase',
+  		findResults: [],
+
+  	};
   },
   onUpdateOrgName: function(event) {
   	this.state.orgName = event.target.value;
@@ -28,6 +33,7 @@ module.exports = React.createClass({
   },
   onNTseqReceive: function(response) {
   	this.setState({NTseqresults: response});
+  	console.log("NTseqresults: ", Object.keys(response).length);
   },
   onGetAAseq: function() {
   	keggAPI.get();
@@ -46,7 +52,7 @@ module.exports = React.createClass({
 	var table = null;
 	if (numResults >0) {
 		table =
-			<table class="table table-hover table-condensed">
+			<table class="table table-hover">
     			<thead><tr><th>#</th><th>Name</th><th>Description</th></tr></thead>
     			<tbody>{tablerows} </tbody>
     		</table>;
